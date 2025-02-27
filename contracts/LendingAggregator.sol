@@ -2,7 +2,6 @@
 pragma solidity 0.8.21;
 
 import {IAggregatorAdapter} from "./interfaces/IAggregatorAdapter.sol";
-
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
@@ -22,6 +21,8 @@ contract LendingAggregator is Ownable, ReentrancyGuard {
 
     // Mapping to store adapters (lending protocols) by protocol ID
     mapping(uint256 => IAggregatorAdapter) public adapters;
+    // Mapping to store protocol names by protocol ID
+    mapping(uint256 => string) public protocolNames;
 
     // Tracks the number of protocols added
     uint256 public protocolCount;
@@ -130,8 +131,10 @@ contract LendingAggregator is Ownable, ReentrancyGuard {
     /// @notice Add a new protocol to the aggregator.
     /// @dev Only the owner can add a protocol. New protocols are added by incrementing `protocolCount`.
     /// @param adapter The address of the lending protocol adapter (contract).
-    function addProtocol(address adapter) external onlyOwner {
+    /// @param name The name of the protocol to associate with the protocol ID.
+    function addProtocol(address adapter, string calldata name) external onlyOwner {
         adapters[protocolCount] = IAggregatorAdapter(adapter); // Add the new adapter
+        protocolNames[protocolCount] = name; // Store the protocol name
         protocolCount++; // Increment the protocol count
     }
 }
