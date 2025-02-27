@@ -101,9 +101,7 @@ contract LendingAggregator is Ownable, ReentrancyGuard {
         userDepositProtocol[msg.sender][asset] = bestProtocolId; // Track protocol
 
         IAggregatorAdapter adapter = adapters[bestProtocolId];
-
-        address protocolAddress = adapter.getProtocolAddress();
-        IERC20(asset).approve(protocolAddress, netAmount);
+        IERC20(asset).approve(address(adapter), netAmount);
 
         adapter.supply(asset, netAmount, msg.sender); // Supply to the best protocol
 
@@ -134,7 +132,6 @@ contract LendingAggregator is Ownable, ReentrancyGuard {
 
         (uint256 bestRate, uint256 bestProtocolId) = getBestBorrowRate(asset);
         IAggregatorAdapter adapter = adapters[bestProtocolId];
-        address protocolAddress = adapter.getProtocolAddress();
 
         // Approve protocol if needed (e.g., for collateral)
         adapter.borrow(asset, netAmount, msg.sender);

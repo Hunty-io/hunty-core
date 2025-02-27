@@ -22,13 +22,15 @@ contract AaveAdapter is IAggregatorAdapter {
 
     function supply(address asset, uint256 amount, address onBehalfOf) external override {
         // Call Aave's supply function to deposit the specified amount of asset into the Aave pool.
+        IERC20(asset).transferFrom(msg.sender, address(this), amount);
+        IERC20(asset).approve(address(aave), amount);
+
         aave.supply(asset, amount, onBehalfOf, 0); // The '0' is the referral code (unused in this case)
     }
 
     function withdraw(address asset, uint256 amount, address to) external override {
         // Call Aave's withdraw function to withdraw the specified amount of asset from the pool.
         aave.withdraw(asset, amount, to); // Withdraw assets to the specified address
-        IERC20(asset).transfer(to, amount);
     }
 
     function borrow(address asset, uint256 amount, address onBehalfOf) external override {
