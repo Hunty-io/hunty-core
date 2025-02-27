@@ -97,12 +97,12 @@ contract LendingAggregator is Ownable, ReentrancyGuard {
         IERC20(asset).safeTransferFrom(msg.sender, address(this), amount);
 
         // Get the best protocol for deposit
-        (uint256 bestRate, uint256 bestProtocolId) = getBestDepositRate(asset);
+        (, uint256 bestProtocolId) = getBestDepositRate(asset);
         userDepositProtocol[msg.sender][asset] = bestProtocolId; // Track protocol
 
         IAggregatorAdapter adapter = adapters[bestProtocolId];
-        IERC20(asset).approve(address(adapter), netAmount);
 
+        IERC20(asset).approve(address(adapter), netAmount);
         adapter.supply(asset, netAmount, msg.sender); // Supply to the best protocol
 
         // Transfer the fee to the treasury
@@ -130,7 +130,7 @@ contract LendingAggregator is Ownable, ReentrancyGuard {
         uint256 fee = (amount * FEE_PERCENT) / 10000; // Calculate fee (0.2%)
         uint256 netAmount = amount + fee; // Total amount including the fee
 
-        (uint256 bestRate, uint256 bestProtocolId) = getBestBorrowRate(asset);
+        (, uint256 bestProtocolId) = getBestBorrowRate(asset);
         IAggregatorAdapter adapter = adapters[bestProtocolId];
 
         // Approve protocol if needed (e.g., for collateral)
