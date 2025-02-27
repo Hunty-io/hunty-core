@@ -27,7 +27,7 @@ const config: HardhatUserConfig = {
           (acc, chain: Chain) => {
             acc[chain.id] = {
               url: chain.rpcUrls.default.http[0],
-              accounts: chain.accounts,
+              accounts: chain.accounts
               // gasPrice: chain.gasPrice,
             }
 
@@ -62,8 +62,8 @@ const config: HardhatUserConfig = {
   },
   etherscan: {
     apiKey: {
-      mainnet: process.env.ARBITRUM_API_KEY!,
-    },
+      mainnet: process.env.ARBITRUM_API_KEY!
+    }
   }
 }
 

@@ -4,7 +4,6 @@ export type AvailableChainContracts = 'lzEndpoint'
 
 export type Chain = IChain & {
   abstractId: number
-  network: string
   accounts: string[]
 }
 
