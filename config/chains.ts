@@ -4,7 +4,5 @@ import { mainnet as mainnetChain } from 'viem/chains'
 import { merge } from 'lodash'
 
 export const ethereum: Chain = merge(mainnetChain, {
-  abstractId: 101,
-  name: 'Ethereum',
   accounts: evmAccounts
 })
