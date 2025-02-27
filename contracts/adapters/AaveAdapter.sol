@@ -4,6 +4,7 @@ pragma solidity 0.8.21;
 import {IPool} from "@aave/core-v3/contracts/interfaces/IPool.sol";
 import {DataTypes} from "@aave/core-v3/contracts/protocol/libraries/types/DataTypes.sol";
 import {IAggregatorAdapter} from "../interfaces/IAggregatorAdapter.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 /// @title AaveAdapter
 /// @notice Adapter for interacting with Aave V3 lending protocol.
@@ -15,6 +16,10 @@ contract AaveAdapter is IAggregatorAdapter {
         aave = IPool(_aave); // Initialize the Aave instance to interact with the pool
     }
 
+    function getProtocolAddress() external view override returns (address) {
+        return address(aave);
+    }
+
     function supply(address asset, uint256 amount, address onBehalfOf) external override {
         // Call Aave's supply function to deposit the specified amount of asset into the Aave pool.
         aave.supply(asset, amount, onBehalfOf, 0); // The '0' is the referral code (unused in this case)
@@ -23,12 +28,14 @@ contract AaveAdapter is IAggregatorAdapter {
     function withdraw(address asset, uint256 amount, address to) external override {
         // Call Aave's withdraw function to withdraw the specified amount of asset from the pool.
         aave.withdraw(asset, amount, to); // Withdraw assets to the specified address
+        IERC20(asset).transfer(to, amount);
     }
 
     function borrow(address asset, uint256 amount, address onBehalfOf) external override {
         // Call Aave's borrow function to borrow the specified amount of asset from the pool.
         // '2' is the interest rate mode (stable rate mode in this case), and '0' is the referral code.
         aave.borrow(asset, amount, 2, 0, onBehalfOf); // Borrow assets with a stable rate
+        IERC20(asset).transfer(msg.sender, amount);
     }
 
     /// @notice Get rates function to fetch the current supply and borrow rates for a given asset in Aave.

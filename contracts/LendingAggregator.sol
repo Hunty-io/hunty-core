@@ -5,6 +5,7 @@ import {IAggregatorAdapter} from "./interfaces/IAggregatorAdapter.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 /// @title Lending Aggregator
 /// @notice Aggregates lending across multiple protocols with optimized borrowing and supplying.
@@ -23,6 +24,8 @@ contract LendingAggregator is Ownable, ReentrancyGuard {
     mapping(uint256 => IAggregatorAdapter) public adapters;
     // Mapping to store protocol names by protocol ID
     mapping(uint256 => string) public protocolNames;
+    /// Mappint to store users assets deposites
+    mapping(address => mapping(address => uint256)) public userDepositProtocol;
 
     // Tracks the number of protocols added
     uint256 public protocolCount;
@@ -95,7 +98,14 @@ contract LendingAggregator is Ownable, ReentrancyGuard {
 
         // Get the best protocol for deposit
         (uint256 bestRate, uint256 bestProtocolId) = getBestDepositRate(asset);
-        adapters[bestProtocolId].supply(asset, netAmount, msg.sender); // Supply to the best protocol
+        userDepositProtocol[msg.sender][asset] = bestProtocolId; // Track protocol
+
+        IAggregatorAdapter adapter = adapters[bestProtocolId];
+
+        address protocolAddress = adapter.getProtocolAddress();
+        IERC20(asset).approve(protocolAddress, netAmount);
+
+        adapter.supply(asset, netAmount, msg.sender); // Supply to the best protocol
 
         // Transfer the fee to the treasury
         IERC20(asset).safeTransfer(treasury, fee);
@@ -106,10 +116,12 @@ contract LendingAggregator is Ownable, ReentrancyGuard {
     /// @param asset The address of the asset to withdraw.
     /// @param amount The amount of the asset to withdraw.
     function withdraw(address asset, uint256 amount) external nonReentrant {
-        // Loop through all protocols to withdraw the asset
-        for (uint256 i = 0; i < protocolCount; i++) {
-            adapters[i].withdraw(asset, amount, msg.sender);
-        }
+        uint256 protocolId = userDepositProtocol[msg.sender][asset];
+
+        require(protocolId < protocolCount, "Invalid protocol");
+        IAggregatorAdapter adapter = adapters[protocolId];
+
+        adapter.withdraw(asset, amount, msg.sender);
     }
 
     /// @notice Borrow an asset from the best protocol based on borrow rate.
@@ -120,12 +132,15 @@ contract LendingAggregator is Ownable, ReentrancyGuard {
         uint256 fee = (amount * FEE_PERCENT) / 10000; // Calculate fee (0.2%)
         uint256 netAmount = amount + fee; // Total amount including the fee
 
-        // Get the best protocol for borrowing
         (uint256 bestRate, uint256 bestProtocolId) = getBestBorrowRate(asset);
-        adapters[bestProtocolId].borrow(asset, netAmount, msg.sender); // Borrow from the best protocol
+        IAggregatorAdapter adapter = adapters[bestProtocolId];
+        address protocolAddress = adapter.getProtocolAddress();
 
-        // Transfer the fee to the treasury
+        // Approve protocol if needed (e.g., for collateral)
+        adapter.borrow(asset, netAmount, msg.sender);
+
         IERC20(asset).safeTransfer(treasury, fee);
+        IERC20(asset).safeTransfer(msg.sender, amount); // Send user the requested amount
     }
 
     /// @notice Add a new protocol to the aggregator.

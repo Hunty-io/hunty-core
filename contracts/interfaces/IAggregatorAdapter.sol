@@ -27,4 +27,6 @@ interface IAggregatorAdapter {
     /// @param amount The amount of the asset to borrow.
     /// @param user The address of the user borrowing the asset.
     function borrow(address asset, uint256 amount, address user) external;
+
+    function getProtocolAddress() external view returns (address);
 }

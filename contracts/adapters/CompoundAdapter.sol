@@ -3,6 +3,7 @@ pragma solidity 0.8.21;
 
 import {IAggregatorAdapter} from "../interfaces/IAggregatorAdapter.sol";
 import {ICompoundV3} from "../interfaces/ICompoundV3.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 /// @title CompoundAdapter
 /// @notice Adapter for interacting with Compound V3 lending protocol.
@@ -13,6 +14,10 @@ contract CompoundAdapter is IAggregatorAdapter {
     /// @param _compound The address of the Compound V3 contract to interact with.
     constructor(address _compound) {
         compound = ICompoundV3(_compound); // Initialize the Compound instance
+    }
+
+    function getProtocolAddress() external view override returns (address) {
+        return address(compound);
     }
 
     /// @notice Supply function to deposit assets into the Compound protocol.
@@ -29,6 +34,7 @@ contract CompoundAdapter is IAggregatorAdapter {
     /// @param to The address where the redeemed assets will be sent.
     function withdraw(address asset, uint256 amount, address to) external override {
         compound.redeem(asset, amount); // Redeem the specified amount of asset from Compound
+        IERC20(asset).transfer(to, amount);
     }
 
     /// @notice Borrow function to borrow assets from the Compound protocol.
@@ -37,6 +43,7 @@ contract CompoundAdapter is IAggregatorAdapter {
     /// @param onBehalfOf The address on behalf of whom the borrowing is done (can be a different address).
     function borrow(address asset, uint256 amount, address onBehalfOf) external override {
         compound.borrow(asset, amount); // Borrow the specified amount of asset from Compound
+        IERC20(asset).transfer(msg.sender, amount);
     }
 
     /// @notice Get rates function to fetch the current borrow rate for a given asset in Compound.
