@@ -23,6 +23,20 @@ Deploy Lending Aggregator:
 pnpm hardhat deploy-lending-aggregator --network 42161 --treasury-address 0x6815547453B8731A39eB420C11E45D6c685a677C
 ```
 
+## Step 1=2 - deploying adapter contracts
+
+Deploy Lending Aggregator:
+
+| Argument            | Description                      | Default |
+| ------------------- | -------------------------------- | ------- |
+| `--adapter`         | Adapter to deploy                | 'aave'  |
+| `--adapter-address` | Adapter address to act on behalf | Address |
+| `--account-index`   | Account index to deploy from     | `0`     |
+
+```bash
+pnpm hardhat deploy-lending-aggregator-adapter --network 42161 --adapter aave --adapter-address 0x6815547453B8731A39eB420C11E45D6c685a677C
+```
+
 ## Verifing contracts
 
 Run this command to verify contracts on selected network

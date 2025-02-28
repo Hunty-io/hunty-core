@@ -78,7 +78,6 @@ task(
         /**
          * getting address
          */
-
         spinner.start()
         console.log(`ℹ️  Checking deployed contract`)
 
