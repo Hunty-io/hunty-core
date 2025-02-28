@@ -85,13 +85,23 @@ contract LendingAggregator is Ownable, ReentrancyGuard {
         }
     }
 
+    function calculateFee(uint256 amount) external pure returns (uint256 fee, uint256 netAmount) {
+        fee = (amount * FEE_PERCENT) / 10000; // Calculate fee (e.g., 0.2%)
+        netAmount = amount - fee; // Net amount after fee deduction
+        return (fee, netAmount);
+    }
+
+    function _calculateFee(uint256 amount) internal view returns (uint256 fee, uint256 netAmount) {
+        return this.calculateFee(amount);
+    }
+
     /// @notice Deposit an asset into the best protocol based on deposit rate.
     /// @dev The function transfers the asset to the contract, then to the best protocol.
     /// @param asset The address of the asset to deposit.
     /// @param amount The amount of the asset to deposit.
     function deposit(address asset, uint256 amount) external nonReentrant {
-        uint256 fee = (amount * FEE_PERCENT) / 10000; // Calculate fee (0.2%)
-        uint256 netAmount = amount - fee; // Net amount after fee deduction
+        // Get the fee and net amount
+        (uint256 fee, uint256 netAmount) = _calculateFee(amount);
 
         // Transfer asset to the contract
         IERC20(asset).safeTransferFrom(msg.sender, address(this), amount);
@@ -127,10 +137,10 @@ contract LendingAggregator is Ownable, ReentrancyGuard {
     /// @param asset The address of the asset to borrow.
     /// @param amount The amount of the asset to borrow.
     function borrow(address asset, uint256 amount) external nonReentrant {
-        uint256 fee = (amount * FEE_PERCENT) / 10000; // Calculate fee (0.2%)
-        uint256 netAmount = amount + fee; // Total amount including the fee
-
+        // Get the fee and net amount
+        (uint256 fee, uint256 netAmount) = _calculateFee(amount);
         (, uint256 bestProtocolId) = getBestBorrowRate(asset);
+
         IAggregatorAdapter adapter = adapters[bestProtocolId];
 
         // Approve protocol if needed (e.g., for collateral)
