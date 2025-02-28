@@ -62,7 +62,7 @@ const config: HardhatUserConfig = {
   },
   etherscan: {
     apiKey: {
-      mainnet: process.env.ARBITRUM_API_KEY!
+      arbitrum: process.env.ARBITRUM_API_KEY!
     }
   }
 }

@@ -1,8 +1,8 @@
 import { reduce } from 'lodash'
-import { ethereum } from './chains'
+import { arbitrum } from './chains'
 import { Chain } from './types'
 
-export const allowedChains = [ethereum]
+export const allowedChains = [arbitrum]
 
 export const allowedChainsConfig = reduce(
   allowedChains,
