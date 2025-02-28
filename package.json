@@ -1,0 +1,59 @@
+{
+  "name": "hunty-core",
+  "version": "1.0.0",
+  "private": false,
+  "repository": "git@github.com:Hunty-io/hunty-core.git",
+  "author": "welliton gervickas <wellitogervickas@gmail.com>",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "node": "NODE_ENV=development hardhat node",
+    "verify": "hardhat verify",
+    "compile": "hardhat compile",
+    "test": "NODE_ENV=development hardhat test",
+    "typechain": "hardhat typechain",
+    "test:coverage": "hardhat coverage",
+    "test:watch": "hardhat typechain && chokidar '(contracts|test)/**/*' -c 'npx hardhat test'",
+    "release:localhost": "NODE_ENV=development && pnpm deploy",
+    "release": "hardhat run scripts/deploy.ts"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-chai-matchers": "^2.0.8",
+    "@nomicfoundation/hardhat-ethers": "^3.0.8",
+    "@nomicfoundation/hardhat-network-helpers": "^1.0.12",
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "@nomicfoundation/hardhat-verify": "^2.0.12",
+    "@nomiclabs/hardhat-solhint": "^4.0.1",
+    "@typechain/ethers-v6": "^0.5.1",
+    "@typechain/hardhat": "^9.1.0",
+    "@types/chai": "^4.2.0",
+    "@types/lodash": "^4.14.202",
+    "@types/mocha": ">=9.1.0",
+    "@types/node": ">=16.0.0",
+    "chai": "^4.2.0",
+    "chokidar-cli": "^3.0.0",
+    "dotenv": "^16.3.1",
+    "ethers": "^6.8.0",
+    "hardhat": "^2.22.18",
+    "hardhat-gas-reporter": "^2.2.2",
+    "prettier": "^3.0.3",
+    "prettier-plugin-solidity": "^1.1.3",
+    "solhint": "^5.0.5",
+    "solhint-plugin-prettier": "^0.1.0",
+    "solidity-coverage": "^0.8.0",
+    "ts-node": ">=8.0.0",
+    "tsconfig-paths": "^4.2.0",
+    "typechain": "^8.3.2",
+    "typescript": ">=4.5.0"
+  },
+  "dependencies": {
+    "@aave/core-v3": "^1.19.3",
+    "@layerzerolabs/solidity-examples": "^1.0.0",
+    "@openzeppelin/contracts": "^4.9.5",
+    "cli-spinners": "^2.9.2",
+    "lodash": "^4.17.21",
+    "viem": "^2.22.16"
+  }
+}
