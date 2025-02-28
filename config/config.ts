@@ -1,8 +1,8 @@
 import { reduce } from 'lodash'
-import { arbitrum, arbitrumSepolia } from './chains'
+import { arbitrum, arbitrumSepolia, sepolia } from './chains'
 import { Chain } from './types'
 
-export const allowedChains = [arbitrum, arbitrumSepolia]
+export const allowedChains = [arbitrum, arbitrumSepolia, sepolia]
 
 export const allowedChainsConfig = reduce(
   allowedChains,
